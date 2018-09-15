@@ -1,0 +1,103 @@
+#!/usr/bin/env sh
+#
+#
+#    ___     _  _  _        _    
+#   | __| __| |(_)| |_  ___| |_  
+#   | _| / _` || ||  _|(_-<| ' \ 
+#   |___|\__,_||_| \__|/__/|_||_|
+#                        
+#   A text editor written entirely in a single shell script,
+#   with support for editing existing and nonexisting files, and
+#   an integrated file chooser.
+#
+#
+#
+#   MIT License
+#   
+#   Copyright (c) 2018 Aidan Williams 
+#   
+#   Permission is hereby granted, free of charge, to any person obtaining a copy
+#   of this software and associated documentation files (the "Software"), to deal
+#   in the Software without restriction, including without limitation the rights
+#   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#   copies of the Software, and to permit persons to whom the Software is
+#   furnished to do so, subject to the following conditions:
+#   
+#   The above copyright notice and this permission notice shall be included in all
+#   copies or substantial portions of the Software.
+#   
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#   SOFTWARE.
+#
+
+
+
+# Variables used in more than one function
+
+__editsh_first_arg="$1" # Argument passed that could be the file
+__editsh_file=""				# Variable refering to the file passed
+__editsh_file_is_dir=0	# Value determines wether the file passed is actually a directory
+__editsh_choose_file=0  # Value determines if the file chooser needs to be displayed
+
+
+
+# Functions
+
+function __editsh_get_file { # Determines if file chooser is needed, if not it sets the file
+	if [ ! "$__editsh_first_arg" = "" ]; then
+		__editsh_file="$__editsh_first_arg"
+		if [ -d "$__editsh_first_arg" ]; then
+			__editsh_file_is_dir=1
+			__editsh_choose_file=1
+		fi
+	else
+		__editsh_choose_file=1
+	fi
+}
+
+function __editsh_file_chooser { # Prompts user for file if needed
+	__editsh_file_chooser_dir="./"
+	if [ "$__editsh_file_is_dir" = 1 ]; then
+		__editsh_file_chooser_dir="$__editsh_first_arg/"
+	fi
+
+	__editsh_file="$(dialog --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
+}
+
+
+function __editsh_edit_file { # Edits and saves file
+	__editsh_current_file="$1"
+	if [ ! -f "$__editsh_current_file" ]; then
+		touch "$__editsh_current_file"
+	fi
+	__editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 20 70)" 
+
+	__editsh_editor_ret_code="$?"
+
+	if [ "$__editsh_editor_ret_code" = 0 ]; then
+		echo "$__editsh_output" > "$__editsh_current_file"
+	else
+		return 1
+	fi
+}
+
+
+function __editsh_main { # Main function
+	__editsh_get_file
+	
+	if [ "$__editsh_choose_file" = 1 ]; then
+		__editsh_file_chooser
+	fi
+
+	__editsh_edit_file "$__editsh_file"
+	return "$?"
+}
+
+
+# Invoke main function
+__editsh_main
