@@ -70,8 +70,16 @@ function __editsh_file_chooser { # Prompts user for file if needed
 		__editsh_file_chooser_dir="$__editsh_first_arg/"
 	fi
 	
+	if [ ! "$1" = '' ]; then
+		__editsh_file_chooser_dir="$1"
+	fi
+
 	# Opens the file chooser and sets the file choosen as the file to be edited
 	__editsh_file="$(dialog --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
+		
+	if [ -d "$__editsh_file" ]; then
+		__editsh_file_chooser "$__editsh_file" 
+	fi
 }
 
 
@@ -84,7 +92,7 @@ function __editsh_edit_file { # Edits and saves file
 	fi
 	
 	# Shows edit dialog, and stores the edited contents
-	__editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 20 70)" 
+	__editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 100 100)" 
 
 	# Return code from the edit prompt
 	__editsh_editor_ret_code="$?"
