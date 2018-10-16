@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 #
 #
 #    ___     _  _  _        _    
@@ -48,7 +48,7 @@ __editsh_choose_file=0  # Value determines if the file chooser needs to be displ
 
 # Functions
 
-function __editsh_get_file { # Determines if file chooser is needed, if not it sets the file
+__editsh_get_file() { # Determines if file chooser is needed, if not it sets the file
   if [ ! "$__editsh_first_arg" = "" ]; then
     __editsh_file="$__editsh_first_arg"
 
@@ -62,7 +62,7 @@ function __editsh_get_file { # Determines if file chooser is needed, if not it s
   fi
 }
 
-function __editsh_file_chooser { # Prompts user for file if needed
+__editsh_file_chooser() { # Prompts user for file if needed
   __editsh_file_chooser_dir="./" # Sets current directory as the default for the file chooser
 
   # Makes sure the path ends with /, as file chooser won't display directory without it
@@ -83,7 +83,7 @@ function __editsh_file_chooser { # Prompts user for file if needed
 }
 
 
-function __editsh_edit_file { # Edits and saves file
+__editsh_edit_file() { # Edits and saves file
   __editsh_current_file="$1"
   
   # Create the file if it doesn't exist already
@@ -105,7 +105,7 @@ function __editsh_edit_file { # Edits and saves file
 }
 
 
-function __editsh_main { # Main function
+__editsh_main() { # Main function
   __editsh_get_file
   
   if [ "$__editsh_choose_file" = 1 ]; then
