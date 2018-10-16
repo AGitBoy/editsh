@@ -40,8 +40,8 @@
 # Variables used in more than one function
 
 __editsh_first_arg="$1" # Argument passed that could be the file
-__editsh_file=""				# Variable refering to the file passed
-__editsh_file_is_dir=0	# Value determines wether the file passed is actually a directory
+__editsh_file=""        # Variable refering to the file passed
+__editsh_file_is_dir=0  # Value determines wether the file passed is actually a directory
 __editsh_choose_file=0  # Value determines if the file chooser needs to be displayed
 
 
@@ -49,71 +49,71 @@ __editsh_choose_file=0  # Value determines if the file chooser needs to be displ
 # Functions
 
 function __editsh_get_file { # Determines if file chooser is needed, if not it sets the file
-	if [ ! "$__editsh_first_arg" = "" ]; then
-		__editsh_file="$__editsh_first_arg"
+  if [ ! "$__editsh_first_arg" = "" ]; then
+    __editsh_file="$__editsh_first_arg"
 
-		if [ -d "$__editsh_first_arg" ]; then # Checks if file passed is a directory
-			__editsh_file_is_dir=1
-			__editsh_choose_file=1
-		fi
-	else
-		# Indicates no file was passed, and to open the file chooser
-		__editsh_choose_file=1
-	fi
+    if [ -d "$__editsh_first_arg" ]; then # Checks if file passed is a directory
+      __editsh_file_is_dir=1
+      __editsh_choose_file=1
+    fi
+  else
+    # Indicates no file was passed, and to open the file chooser
+    __editsh_choose_file=1
+  fi
 }
 
 function __editsh_file_chooser { # Prompts user for file if needed
-	__editsh_file_chooser_dir="./" # Sets current directory as the default for the file chooser
+  __editsh_file_chooser_dir="./" # Sets current directory as the default for the file chooser
 
-	# Makes sure the path ends with /, as file chooser won't display directory without it
-	if [ "$__editsh_file_is_dir" = 1 ]; then
-		__editsh_file_chooser_dir="$__editsh_first_arg/"
-	fi
-	
-	if [ ! "$1" = '' ]; then
-		__editsh_file_chooser_dir="$1"
-	fi
+  # Makes sure the path ends with /, as file chooser won't display directory without it
+  if [ "$__editsh_file_is_dir" = 1 ]; then
+    __editsh_file_chooser_dir="$__editsh_first_arg/"
+  fi
+  
+  if [ ! "$1" = '' ]; then
+    __editsh_file_chooser_dir="$1"
+  fi
 
-	# Opens the file chooser and sets the file choosen as the file to be edited
-	__editsh_file="$(dialog --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
-		
-	if [ -d "$__editsh_file" ]; then
-		__editsh_file_chooser "$__editsh_file" 
-	fi
+  # Opens the file chooser and sets the file choosen as the file to be edited
+  __editsh_file="$(dialog --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
+    
+  if [ -d "$__editsh_file" ]; then
+    __editsh_file_chooser "$__editsh_file" 
+  fi
 }
 
 
 function __editsh_edit_file { # Edits and saves file
-	__editsh_current_file="$1"
-	
-	# Create the file if it doesn't exist already
-	if [ ! -f "$__editsh_current_file" ]; then
-		touch "$__editsh_current_file"
-	fi
-	
-	# Shows edit dialog, and stores the edited contents
-	__editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 100 100)" 
+  __editsh_current_file="$1"
+  
+  # Create the file if it doesn't exist already
+  if [ ! -f "$__editsh_current_file" ]; then
+    touch "$__editsh_current_file"
+  fi
+  
+  # Shows edit dialog, and stores the edited contents
+  __editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 100 100)" 
 
-	# Return code from the edit prompt
-	__editsh_editor_ret_code="$?"
-	
-	if [ "$__editsh_editor_ret_code" = 0 ]; then
-		echo "$__editsh_output" > "$__editsh_current_file" # Writes the new contents to the file
-	else # If the dialog didn't return zero (i.e. because it was cancelled), doesn't write to the file
-		return 0 
-	fi
+  # Return code from the edit prompt
+  __editsh_editor_ret_code="$?"
+  
+  if [ "$__editsh_editor_ret_code" = 0 ]; then
+    echo "$__editsh_output" > "$__editsh_current_file" # Writes the new contents to the file
+  else # If the dialog didn't return zero (i.e. because it was cancelled), doesn't write to the file
+    return 0 
+  fi
 }
 
 
 function __editsh_main { # Main function
-	__editsh_get_file
-	
-	if [ "$__editsh_choose_file" = 1 ]; then
-		__editsh_file_chooser
-	fi
+  __editsh_get_file
+  
+  if [ "$__editsh_choose_file" = 1 ]; then
+    __editsh_file_chooser
+  fi
 
-	__editsh_edit_file "$__editsh_file"
-	return 0 
+  __editsh_edit_file "$__editsh_file"
+  return 0 
 }
 
 
