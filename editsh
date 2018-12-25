@@ -98,14 +98,19 @@ __editsh_edit_file() { # Edits and saves file
   __editsh_editor_ret_code="$?"
   
   if [ "$__editsh_editor_ret_code" = 0 ]; then
-    echo "$__editsh_output" > "$__editsh_current_file" # Writes the new contents to the file
-  else # If the dialog didn't return zero (i.e. because it was cancelled), doesn't write to the file
+    if [ -w "$__editsh_current_file" ]; then
+      echo "$__editsh_output" > "$__editsh_current_file"
+    else
+      echo "$__editsh_output" | sudo tee "$__editsh_current_file"
+    fi
+  else 
+    # If the dialog didn't return zero (i.e. because it was cancelled), doesn't write to the file
     return 0 
   fi
 }
 
-
-__editsh_main() { # Main function
+# Main function
+__editsh_main() { 
   __editsh_get_file
   
   if [ "$__editsh_choose_file" = 1 ]; then
