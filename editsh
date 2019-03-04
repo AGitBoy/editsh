@@ -35,16 +35,19 @@
 #   SOFTWARE.
 #
 
-
+# Config options
+export EDITSH_DIALOG="dialog" # Xdialog or dialog, typically
 
 # Variables used in more than one function
 
-__editsh_first_arg="$1" # Argument passed that could be the file
-__editsh_file=""        # Variable refering to the file passed
-__editsh_file_is_dir=0  # Value determines wether the file passed is actually a directory
-__editsh_choose_file=0  # Value determines if the file chooser needs to be displayed
+__editsh_first_arg="$1"       # Argument passed that could be the file
+__editsh_file=""              # Variable refering to the file passed
+__editsh_file_is_dir=0        # Value determines wether the file passed is actually a directory
+__editsh_choose_file=0        # Value determines if the file chooser needs to be displayed
 
-
+if [ -f ~/.editshrc ]; then
+  source ~/.editshrc
+fi
 
 # Functions
 
@@ -75,8 +78,8 @@ __editsh_file_chooser() { # Prompts user for file if needed
   fi
 
   # Opens the file chooser and sets the file choosen as the file to be edited
-  __editsh_file="$(dialog --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
-    
+  __editsh_file="$($EDITSH_DIALOG --stdout --title 'Choose file' --fselect $__editsh_file_chooser_dir 20 70)"
+
   if [ -d "$__editsh_file" ]; then
     __editsh_file_chooser "$__editsh_file" 
   fi
@@ -92,7 +95,7 @@ __editsh_edit_file() { # Edits and saves file
   fi
   
   # Shows edit dialog, and stores the edited contents
-  __editsh_output="$(dialog --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 100 100)" 
+  __editsh_output="$($EDITSH_DIALOG --stdout --title "Edit $(basename $__editsh_current_file)" --editbox "$__editsh_current_file" 100 100)" 
 
   # Return code from the edit prompt
   __editsh_editor_ret_code="$?"
