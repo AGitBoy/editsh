@@ -1,3 +1,5 @@
+# [THIS PROJECT HAS BEEN MIGRATED TO GITLAB](https://gitlab.com/AGitBoy/editsh)
+
 # Editsh
 A text editor written entirely in a single shell script,
 with support for editing existing and nonexisting files, and
